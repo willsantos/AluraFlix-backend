@@ -79,15 +79,37 @@ class VideosController extends AbstractController
      */
     public function update(int $id, Request $request): Response
     {
-        $body = json_decode($request->getContent());
+
+        //funciona com JSON
+            //$body = json_decode($request->getContent());
+
+
+        // só funciona com x-www-form-urlencoded
+        $body = $request->request->all();
         $video = $this->repository->find($id);
 
-        //TODO: precisa implementar o PATCH tb, no momento ele necessita receber todos os campos
 
-        $video
+
+        // só funciona com x-www-form-urlencoded
+       if($request->request->has('title')){
+            $video->setTitle($body['title']);
+        }
+
+        if($request->request->has('description')){
+            $video->setDescription($body['description']);
+        }
+
+        if($request->request->has('url')){
+            $video->setUrl($body['url']);
+        }
+
+
+        //TODO: preciso entender melhor esse comportamento
+
+        /*$video
             ->setTitle($body->title)
             ->setDescription($body->description)
-            ->setUrl($body->url);
+            ->setUrl($body->url);*/
 
         $this->entityManager->flush();
 
