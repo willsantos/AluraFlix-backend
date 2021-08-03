@@ -59,13 +59,35 @@ class VideosController extends AbstractController
 
     public function create(Request $request): Response
     {
-        $body = json_decode($request->getContent());
+        $body = json_decode($request->getContent(),true);
+
+        /*if($body['title']  && $body['description']  && $body['url'] === null){
+            return new JsonResponse('Todos os campos são obrigatórios', Response::HTTP_BAD_REQUEST);
+        }*/
+
+
+
+        switch ($body){
+            case !array_key_exists('title',$body):
+                return new JsonResponse('Todos os campos são obrigatórios, você não preencheu o título',
+                    Response::HTTP_BAD_REQUEST);
+                break;
+            case !array_key_exists('description',$body):
+                return new JsonResponse('Todos os campos são obrigatórios, você não preencheu a descrição',
+                    Response::HTTP_BAD_REQUEST);
+                break;
+            case !array_key_exists('url', $body):
+                return new JsonResponse('Todos os campos são obrigatórios, você não preencheu a url',
+                    Response::HTTP_BAD_REQUEST);
+                break;
+        }
+
 
         $video = new Videos();
         $video
-            ->setTitle($body->title)
-            ->setDescription($body->description)
-            ->setUrl($body->url);
+            ->setTitle($body['title'])
+            ->setDescription($body['description'])
+            ->setUrl($body['url']);
 
         $this->entityManager->persist($video);
         $this->entityManager->flush();
