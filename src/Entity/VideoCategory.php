@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=VideoCategoryRepository::class)
  */
-class VideoCategory
+class VideoCategory implements \JsonSerializable
 {
     /**
      * @ORM\Id
@@ -96,5 +96,14 @@ class VideoCategory
         }
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id'=>$this->getId(),
+            'title'=>$this->getTitle(),
+            'color'=>$this->getColor()
+        ];
     }
 }
