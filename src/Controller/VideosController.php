@@ -61,10 +61,6 @@ class VideosController extends AbstractController
     {
         $body = json_decode($request->getContent(),true);
 
-        /*if($body['title']  && $body['description']  && $body['url'] === null){
-            return new JsonResponse('Todos os campos são obrigatórios', Response::HTTP_BAD_REQUEST);
-        }*/
-
 
 
         switch ($body){
