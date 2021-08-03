@@ -17,7 +17,7 @@ class VideoCategoriesController extends AbstractController
     private VideoCategoryRepository $repository;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
+        EntityManagerInterface  $entityManager,
         VideoCategoryRepository $repository
     )
     {
@@ -31,7 +31,7 @@ class VideoCategoriesController extends AbstractController
     public function index(): Response
     {
         $category = $this->repository->findAll();
-        return new JsonResponse($category,Response::HTTP_OK);
+        return new JsonResponse($category, Response::HTTP_OK);
     }
 
     /**
@@ -41,11 +41,11 @@ class VideoCategoriesController extends AbstractController
     {
         $category = $this->repository->find($id);
 
-        if(is_null($category)){
-            return new JsonResponse('Not Found',Response::HTTP_NOT_FOUND);
+        if (is_null($category)) {
+            return new JsonResponse('Not Found', Response::HTTP_NOT_FOUND);
         }
 
-        return new JsonResponse($category,Response::HTTP_OK);
+        return new JsonResponse($category, Response::HTTP_OK);
 
     }
 
@@ -54,19 +54,30 @@ class VideoCategoriesController extends AbstractController
      */
     public function create(Request $request): Response
     {
-        $body = json_decode($request->getContent(),true);
+        $body = json_decode($request->getContent());
 
         //TODO: Validate fields
 
+        switch ($body) {
+            case !isset($body->title):
+                return new JsonResponse('Todos os campos são Obrigatórios, você não preencheu o título',
+                    Response::HTTP_BAD_REQUEST);
+                break;
+            case !isset($body->color):
+                return new JsonResponse('Todos os campos são Obrigatórios, você não preencheu a cor',
+                    Response::HTTP_BAD_REQUEST);
+                break;
+        }
+
         $category = new VideoCategory();
         $category
-            ->setTitle($body['title'])
-            ->setColor($body['color']);
+            ->setTitle($body->title)
+            ->setColor($body->color);
 
         $this->entityManager->persist($category);
         $this->entityManager->flush();
 
-        return new JsonResponse($category,Response::HTTP_CREATED);
+        return new JsonResponse($category, Response::HTTP_CREATED);
 
     }
 
@@ -78,16 +89,16 @@ class VideoCategoriesController extends AbstractController
         $body = json_decode($request->getContent());
         $category = $this->repository->find($id);
 
-        if(isset($body->title)){
+        if (isset($body->title)) {
             $category->setTitle($body->title);
         }
-        if(isset($body->color)){
+        if (isset($body->color)) {
             $category->setColor($body->color);
         }
 
         $this->entityManager->flush();
 
-        return new JsonResponse($category,Response::HTTP_OK);
+        return new JsonResponse($category, Response::HTTP_OK);
 
     }
 
@@ -97,13 +108,13 @@ class VideoCategoriesController extends AbstractController
     public function remove(int $id): Response
     {
         $category = $this->repository->find($id);
-        if(is_null($category)){
-            return new JsonResponse('Not Found',Response::HTTP_NOT_FOUND);
+        if (is_null($category)) {
+            return new JsonResponse('Not Found', Response::HTTP_NOT_FOUND);
         }
         $this->entityManager->remove($category);
         $this->entityManager->flush();
 
-        return new JsonResponse('',Response::HTTP_NO_CONTENT);
+        return new JsonResponse('', Response::HTTP_NO_CONTENT);
     }
 
 
