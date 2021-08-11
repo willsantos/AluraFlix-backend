@@ -32,6 +32,12 @@ class Videos implements \JsonSerializable
      */
     private $url;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=VideoCategory::class, inversedBy="videos")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $categoriaId;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -81,5 +87,17 @@ class Videos implements \JsonSerializable
             'description'=>$this->getDescription(),
             'url'=>$this->getUrl()
         ];
+    }
+
+    public function getCategoriaId(): ?VideoCategory
+    {
+        return $this->categoriaId;
+    }
+
+    public function setCategoriaId(?VideoCategory $categoriaId): self
+    {
+        $this->categoriaId = $categoriaId;
+
+        return $this;
     }
 }
