@@ -63,6 +63,7 @@ security:
     # this is a catch-all for the admin area
     # additional security lives in the controllers
     - { path: '^/login/', roles: IS_AUTHENTICATED_ANONYMOUSLY}
+    - { path: '^/videos/free$', roles: IS_AUTHENTICATED_ANONYMOUSLY}
     - { path: '/videos', roles: IS_AUTHENTICATED_FULLY}
     - { path: '/categorias', roles: IS_AUTHENTICATED_FULLY}
 

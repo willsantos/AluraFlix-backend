@@ -27,7 +27,6 @@ class VideosController extends AbstractController
 
     )
     {
-
         $this->entityManager = $entityManager;
         $this->repository = $repository;
         $this->categoryRepository = $categoryRepository;
@@ -55,11 +54,15 @@ class VideosController extends AbstractController
     }
 
     /**
-     * @Route("/videos/{id}",methods={"GET"})
+     * @Route("/videos/{id}",methods={"GET"},requirements={"id"="\d+"})
      */
     public function show(int $id): Response
     {
+
+
         $video = $this->repository->find($id);
+
+
 
         if(is_null($video)){
             return new JsonResponse('Not Found',Response::HTTP_NOT_FOUND);
@@ -171,7 +174,7 @@ class VideosController extends AbstractController
     }
 
     /**
-     * @Route("/categorias/{id}/videos",methods={"GET"})
+     * @Route("/categorias/{id}/videos",methods={"GET"}, name="api.category")
      */
     public function findByCategory(int $id)
     {
@@ -184,6 +187,22 @@ class VideosController extends AbstractController
         ]);
 
         return new JsonResponse($category);
+    }
+
+    /**
+     * @Route("/videos/free",methods={"GET"})
+     * TODO: Preciso pensar em uma forma de náo repetir a função só pra ter uma rota personalizada
+     */
+    public function showFreeCategory(): Response
+    {
+
+        $videos = $this->repository->findBy([
+            'categoriaId' => 1
+        ]);
+
+
+
+        return new JsonResponse($videos);
     }
 
 }

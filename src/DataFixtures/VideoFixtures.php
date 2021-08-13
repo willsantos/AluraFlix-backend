@@ -24,7 +24,7 @@ class VideoFixtures extends Fixture implements DependentFixtureInterface
             $video = new Videos();
             $video
                 ->setTitle('Video'.$i)
-                ->setCategoriaId($this->repository->find(mt_rand(1,5)))
+                ->setCategoriaId($this->repository->find(mt_rand(1,4)))
                 ->setDescription('Fictum, deserunt mollit anim laborum astutumque! Quisque placerat facilisis egestas cillum dolore. Nec dubitamus multa iter quae et nos invenerat. Contra legem facit qui id facit quod lex prohibet. Quam diu etiam furor iste tuus nos eludet?')
                 ->setUrl('https://www.youtube.com/alura');
 
