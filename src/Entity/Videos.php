@@ -85,7 +85,8 @@ class Videos implements \JsonSerializable
             'id' => $this->getId(),
             'title'=>$this->getTitle(),
             'description'=>$this->getDescription(),
-            'url'=>$this->getUrl()
+            'url'=>$this->getUrl(),
+            'categoryId'=>$this->getCategoriaId()->getId()
         ];
     }
 

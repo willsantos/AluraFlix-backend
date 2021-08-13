@@ -5,6 +5,7 @@ namespace App\Controller;
 
 
 use App\Entity\Videos;
+use App\Repository\VideoCategoryRepository;
 use App\Repository\VideosRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,23 +18,39 @@ class VideosController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
     private VideosRepository $repository;
+    private VideoCategoryRepository $categoryRepository;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        VideosRepository $repository
+        VideosRepository $repository,
+        VideoCategoryRepository $categoryRepository
+
     )
     {
 
         $this->entityManager = $entityManager;
         $this->repository = $repository;
+        $this->categoryRepository = $categoryRepository;
     }
 
     /**
      * @Route("/videos",methods={"GET"})
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $videos = $this->repository->findAll();
+
+        $query = $request->query->all();
+
+        $page = array_key_exists('page',$query) ? $query['page'] : 1;
+        unset($query['page']);
+
+
+        $videos = $this->repository->findBy(
+            $query,
+            ['title'=>'ASC'],
+            5,
+            ($page -1)*5
+        );
         return new JsonResponse($videos);
     }
 
@@ -48,7 +65,7 @@ class VideosController extends AbstractController
             return new JsonResponse('Not Found',Response::HTTP_NOT_FOUND);
         }
 
-        return new JsonResponse($video);
+        return new JsonResponse($video, Response::HTTP_OK);
     }
 
 
@@ -60,8 +77,8 @@ class VideosController extends AbstractController
     public function create(Request $request): Response
     {
         $body = json_decode($request->getContent(),true);
-
-
+        $category = $this->categoryRepository->find(1);
+        $video = new Videos();
 
         switch ($body){
             case !array_key_exists('title',$body):
@@ -76,10 +93,17 @@ class VideosController extends AbstractController
                 return new JsonResponse('Todos os campos são obrigatórios, você não preencheu a url',
                     Response::HTTP_BAD_REQUEST);
                 break;
+            case !array_key_exists('categoryId',$body):
+                $video->setCategoriaId($category);
+                break;
+
+        }
+        //TODO: REFATORAR para obj URGENTE
+        if(array_key_exists('categoryId',$body)){
+            $category = $this->categoryRepository->find($body['categoryId']);
+            $video->setCategoriaId($category);
         }
 
-
-        $video = new Videos();
         $video
             ->setTitle($body['title'])
             ->setDescription($body['description'])
@@ -144,6 +168,22 @@ class VideosController extends AbstractController
         $this->entityManager->flush();
 
         return new JsonResponse('',Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @Route("/categorias/{id}/videos",methods={"GET"})
+     */
+    public function findByCategory(int $id)
+    {
+        $repository = $this
+            ->getDoctrine()
+            ->getRepository(Videos::class);
+
+        $category = $repository->findBy([
+            'categoriaId' =>$id
+        ]);
+
+        return new JsonResponse($category);
     }
 
 }
